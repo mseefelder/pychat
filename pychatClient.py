@@ -9,11 +9,12 @@ def prompt() :
 if __name__ == "__main__":
      
     if(len(sys.argv) < 3) :
-        print 'Uso : python pychatClient.py host porta \n Example: python pychatClient.py localhost 5000'
+        print 'Uso : python pychatClient.py host porta apelido \n Example: python pychatClient.py localhost 5000 Zeca'
         sys.exit()
      
     host = sys.argv[1]
     port = int(sys.argv[2])
+    username = sys.argv[3]
      
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(2)
@@ -24,6 +25,9 @@ if __name__ == "__main__":
     except :
         print 'Falha ao conectar com o servidor'
         sys.exit()
+
+    s.send("setUsername->"+username)
+    prompt()
      
     print 'Conectado. Pode mandar mensagens...'
     prompt()

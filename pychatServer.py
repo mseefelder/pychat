@@ -13,11 +13,14 @@ def broadcast_data (sock, message):
                 # broken socket connection may be, chat client pressed ctrl+c for example
                 socket.close()
                 CONNECTION_LIST.remove(socket)
+                print "Client %s is offline" % USERNAMES[str(socket.getpeername())]
+                del USERNAMES[str(socket.getpeername())]
  
 if __name__ == "__main__":
      
     # List to keep track of socket descriptors
     CONNECTION_LIST = []
+    USERNAMES = {}
     RECV_BUFFER = 4096 # Advisable to keep it as an exponent of 2
     PORT = 5000
      
@@ -42,9 +45,8 @@ if __name__ == "__main__":
                 # Handle the case in which there is a new connection recieved through server_socket
                 sockfd, addr = server_socket.accept()
                 CONNECTION_LIST.append(sockfd)
+                USERNAMES[str(sockfd.getpeername())] = "Sem nome"
                 print "Client (%s, %s) connected" % addr
-                 
-                broadcast_data(sockfd, "[%s:%s] entered room\n" % addr)
              
             #Some incoming message from a client
             else:
@@ -54,13 +56,19 @@ if __name__ == "__main__":
                     # a "Connection reset by peer" exception will be thrown
                     data = sock.recv(RECV_BUFFER)
                     if data:
-                        broadcast_data(sock, "\r" + '<' + str(sock.getpeername()) + '> ' + data)                
+                        if data.startswith("setUsername->"):
+                            USERNAMES[str(sock.getpeername())] = data.replace("setUsername->","",1)
+                            print "New username: %s" % USERNAMES[str(sock.getpeername())]
+                            broadcast_data(sock, "\r" + '<' + USERNAMES[str(sock.getpeername())] + '> entrou na conversa\n')
+                        else:
+                            broadcast_data(sock, "\r" + '<' + USERNAMES[str(sock.getpeername())] + '> ' + data)                
                  
                 except:
                     broadcast_data(sock, "Client (%s, %s) is offline" % addr)
                     print "Client (%s, %s) is offline" % addr
                     sock.close()
-                    #CONNECTION_LIST.remove(sock)
+                    CONNECTION_LIST.remove(sock)
+                    del USERNAMES[str(sock.getpeername())]
                     continue
      
     server_socket.close()
