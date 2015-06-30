@@ -52,11 +52,11 @@ if __name__ == "__main__":
             #user entered a message
             else :
                	msg = sys.stdin.readline()
-		a = msg[:-1]
-		a = a.replace(" ","")
-		if str(a[:]) == "exit":
-			s.send(msg)
-			s.shutdown(1)	
-		else:
-                	s.send(msg)	
-        	        prompt()
+                a = msg[:-1]
+                a = a.replace(" ","")
+                if str(a[:]) == "exit":
+                    s.send(msg)
+                    s.shutdown(1)
+                else:
+                    s.send(msg)
+                    prompt()
