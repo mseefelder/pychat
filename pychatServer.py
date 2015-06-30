@@ -20,6 +20,7 @@ if __name__ == "__main__":
      
     # List to keep track of socket descriptors
     CONNECTION_LIST = []
+    REMOVED_SOCKETS = []
     USERNAMES = {}
     RECV_BUFFER = 4096 # Advisable to keep it as an exponent of 2
     PORT = 5000
@@ -61,14 +62,26 @@ if __name__ == "__main__":
                             print "New username: %s" % USERNAMES[str(sock.getpeername())]
                             broadcast_data(sock, "\r" + '<' + USERNAMES[str(sock.getpeername())] + '> entrou na conversa\n')
                         else:
-                            broadcast_data(sock, "\r" + '<' + USERNAMES[str(sock.getpeername())] + '> ' + data)                
+			    a = data[:-1]
+			    if str(a) == "exit":				
+				usuario = USERNAMES[str(sock.getpeername())]
+				#inform = "O usuario " + str(usuario) + " foi desconectado!"
+				#broadcast_data(sock, "\r" + inform)
+				REMOVED_SOCKETS.append(sock)
+				sock.close()
+				CONNECTION_LIST.remove(sock)
+				
+                    		del USERNAMES[str(sock.getpeername())]
+			    else:
+				broadcast_data(sock, "\r" + '<' + USERNAMES[str(sock.getpeername())] + '> ' + data)                
                  
                 except:
                     broadcast_data(sock, "Client (%s, %s) is offline" % addr)
                     print "Client (%s, %s) is offline" % addr
                     sock.close()
-                    CONNECTION_LIST.remove(sock)
-                    del USERNAMES[str(sock.getpeername())]
-                    continue
+		    if (sock in REMOVED_SOCKETS) == False:
+		    	CONNECTION_LIST.remove(sock)
+                    	del USERNAMES[str(sock.getpeername())]
+                    	continue
      
     server_socket.close()

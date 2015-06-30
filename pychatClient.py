@@ -37,7 +37,6 @@ if __name__ == "__main__":
          
         # Get the list sockets which are readable
         read_sockets, write_sockets, error_sockets = select.select(socket_list , [], [])
-         
         for sock in read_sockets:
             #incoming message from remote server
             if sock == s:
@@ -52,6 +51,12 @@ if __name__ == "__main__":
              
             #user entered a message
             else :
-                msg = sys.stdin.readline()
-                s.send(msg)
-                prompt()
+               	msg = sys.stdin.readline()
+		a = msg[:-1]
+		a = a.replace(" ","")
+		if str(a[:]) == "exit":
+			s.send(msg)
+			s.shutdown(1)	
+		else:
+                	s.send(msg)	
+        	        prompt()
