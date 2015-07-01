@@ -126,7 +126,11 @@ class ChatUI:
         last = -1
         while last != ord('\n'):
             last = self.stdscr.getch()
-            if last == ord('\n'):
+            if last == curses.KEY_UP: pass
+            elif last == curses.KEY_DOWN: pass
+            elif last == curses.KEY_LEFT: pass
+            elif last == curses.KEY_RIGHT: pass
+            elif last == ord('\n'):
                 tmp = self.inputbuffer
                 self.inputbuffer = ""
                 self.redraw_chatline()

@@ -63,7 +63,7 @@ if __name__ == "__main__":
                             broadcast_data(sock, "\r" + '<' + USERNAMES[str(sock.getpeername())] + '> entrou na conversa\n')
                         else:
 			    a = data[:-1]
-			    if str(a) == "exit":				
+			    if str(a) == "/quit":				
 				usuario = USERNAMES[str(sock.getpeername())]
 				#inform = "O usuario " + str(usuario) + " foi desconectado!"
 				#broadcast_data(sock, "\r" + inform)
