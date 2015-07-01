@@ -4,9 +4,8 @@ import socket, select, string, sys
 import thread
 import time
 
-def emissor(serverSocket,ui,lock):
-	print "Emissor"
-	ui.chatbuffer_add("Receiving")
+def receptor(serverSocket,ui,lock):
+	ui.chatbuffer_add("Recebendo")
 	while True:
 		try:
 			msg = serverSocket.recv(4096)
@@ -29,17 +28,10 @@ def emissor(serverSocket,ui,lock):
 			sys.exit(1)
 		else:
 			if len(msg) == 0:
-				print 'orderly shutdown on server end'
+				print 'Servidor fechado. Parando de receber.'
 				sys.exit(0)
 			else:
 				ui.chatbuffer_add("<Interlocutor> "+msg)
-
-def receptor(serverSocket,ui,lock):
-	ui.chatbuffer_add("Chatting")
-	inp = ""
-	while inp != "/quit":
-		inp = ui.wait_input()
-		serverSocket.send(inp+"\n")
 
 def main(stdscr):
 	stdscr.clear()
@@ -47,13 +39,12 @@ def main(stdscr):
 
 	host = ui.wait_input("Host: ")
 	port = int(ui.wait_input("Porta: "))
-	username = ui.wait_input("Apelido: ")
 
 	#Connection setup
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	s.settimeout(5)
 
-    # connect to remote host
+    # conecta ao host remoto
 	try :
 		s.connect((host, port))
 	except :
@@ -65,14 +56,15 @@ def main(stdscr):
 	ui.redraw_ui()
 
 	lock = thread.allocate_lock()
-	thread.start_new_thread(emissor, (s, ui,lock))
-	#thread.start_new_thread(receptor, (s, ui,lock))
+	thread.start_new_thread(receptor, (s, ui,lock))
 
-	inp = ""
-	while inp != "/quit":
-		inp = ui.wait_input()
-		ui.chatbuffer_add("<Eu> "+inp)
-		s.send(inp+" \n")
+	msg = ""
+	while msg != "/sair":
+		msg = ui.wait_input()
+		ui.chatbuffer_add("<Eu> "+msg)
+		s.send(msg+" \n")
+
+	sys.exit(1)
 
 if __name__ == "__main__":
 	wrapper(main)

@@ -28,7 +28,7 @@ def receptor(listenerSocket,ui,lock):
 			sys.exit(1)
 		else:
 			if len(msg) == 0:
-				print 'orderly shutdown on server end'
+				print 'Interlocutor desconectado.'
 				sys.exit(0)
 			else:
 				ui.chatbuffer_add("<Interlocutor> " + msg)
@@ -37,16 +37,16 @@ def main(stdscr):
 	stdscr.clear()
 	ui = ChatUI(stdscr)
 
-	RECV_BUFFER = 4096 # Advisable to keep it as an exponent of 2
+	RECV_BUFFER = 4096
 	PORT = 5000
      
 	server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # this has no effect, why ?
+
 	server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 	server_socket.bind(("0.0.0.0", PORT))
 	server_socket.listen(1)
 
-	ui.chatbuffer_add('Aguardando ouvinte...\n')
+	ui.chatbuffer_add('Host: localhost; '+'Porta: '+str(PORT)+'; \n Aguardando ouvinte...\n')
 
 	listener, addr = server_socket.accept()
 
@@ -58,10 +58,12 @@ def main(stdscr):
 	thread.start_new_thread(receptor, (listener, ui, lock))
 
 	inp = ""
-	while inp != "/quit":
+	while inp != "/sair":
 		inp = ui.wait_input()
 		ui.chatbuffer_add("<Eu> "+inp)
 		listener.send(inp+" \n")
+
+	sys.exit(1)
 
 if __name__ == "__main__":
 	wrapper(main)
