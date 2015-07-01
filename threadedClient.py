@@ -51,7 +51,7 @@ def main(stdscr):
 
 	#Connection setup
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s.settimeout(2)
+	s.settimeout(5)
 
     # connect to remote host
 	try :
@@ -65,13 +65,16 @@ def main(stdscr):
 
 	ui.chatbuffer_add('Conectado. Pode mandar mensagens...\n')
 
+	ui.redraw_ui()
+
 	lock = thread.allocate_lock()
 	thread.start_new_thread(emissor, (s, ui,lock))
-	thread.start_new_thread(receptor, (s, ui,lock))
+	#thread.start_new_thread(receptor, (s, ui,lock))
 
 	inp = ""
 	while inp != "/quit":
 		inp = ui.wait_input()
+		s.send(inp+" \n")
 
 if __name__ == "__main__":
 	wrapper(main)
