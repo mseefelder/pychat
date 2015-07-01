@@ -65,6 +65,8 @@ def main(stdscr):
 
 	ui.chatbuffer_add('Conectado. Pode mandar mensagens...\n')
 
+	ui.redraw_ui()
+
 	lock = thread.allocate_lock()
 	thread.start_new_thread(emissor, (s, ui,lock))
 	thread.start_new_thread(receptor, (s, ui,lock))
